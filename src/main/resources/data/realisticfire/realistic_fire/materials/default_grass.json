@@ -9,10 +9,10 @@
     { "tag": "minecraft:flowers" },
     { "tag": "minecraft:saplings" }
   ],
-  "fuel": 0.35,
-  "ignition_temperature_k": 430.0,
+  "fuel": 0.22,
+  "ignition_temperature_k": 460.0,
   "burn_rate": 0.18,
-  "heat_release": 900.0,
+  "heat_release": 620.0,
   "smoke_yield": 0.12,
   "moisture": 0.04,
   "insulation": 0.05,

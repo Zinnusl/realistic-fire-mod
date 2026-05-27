@@ -7,3 +7,5 @@ src/main/rust/**/target/
 
 *.log
 hs_err_pid*
+
+Makefile

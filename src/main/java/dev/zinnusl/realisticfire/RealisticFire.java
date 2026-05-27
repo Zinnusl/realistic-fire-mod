@@ -6,8 +6,11 @@ import dev.zinnusl.realisticfire.network.RealisticFireNetwork;
 import dev.zinnusl.realisticfire.registry.RealisticFireBlocks;
 import dev.zinnusl.realisticfire.simulation.FireSimulationManager;
 import dev.zinnusl.realisticfire.simulation.material.FireMaterialReloadListener;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -16,10 +19,12 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +37,9 @@ public final class RealisticFire {
         RealisticFireConfig.register(modContainer);
         RealisticFireBlocks.register(modEventBus);
         RealisticFireNetwork.register(modEventBus);
+
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            registerClientHooks();
+            registerClientHooks(modEventBus);
         }
 
         NeoForge.EVENT_BUS.addListener(RealisticFire::registerReloadListeners);
@@ -41,10 +47,13 @@ public final class RealisticFire {
         NeoForge.EVENT_BUS.addListener(RealisticFire::onLevelTick);
         NeoForge.EVENT_BUS.addListener(RealisticFire::onChunkLoad);
         NeoForge.EVENT_BUS.addListener(RealisticFire::onChunkUnload);
+        NeoForge.EVENT_BUS.addListener(RealisticFire::onLevelLoad);
         NeoForge.EVENT_BUS.addListener(RealisticFire::onLevelUnload);
         NeoForge.EVENT_BUS.addListener(RealisticFire::onBlockPlace);
         NeoForge.EVENT_BUS.addListener(RealisticFire::onBlockBreak);
         NeoForge.EVENT_BUS.addListener(RealisticFire::onFluidPlaceBlock);
+        NeoForge.EVENT_BUS.addListener(RealisticFire::onPlayerLoggedIn);
+        NeoForge.EVENT_BUS.addListener(RealisticFire::onPlayerChangedDimension);
 
         LOGGER.info("Realistic Fire initialized");
     }
@@ -53,8 +62,11 @@ public final class RealisticFire {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
-    private static void registerClientHooks() {
+    private static void registerClientHooks(IEventBus modEventBus) {
         try {
+            Class.forName("dev.zinnusl.realisticfire.client.ClientFireShaders")
+                    .getMethod("register", IEventBus.class)
+                    .invoke(null, modEventBus);
             Class.forName("dev.zinnusl.realisticfire.client.ClientFireParticles")
                     .getMethod("register")
                     .invoke(null);
@@ -89,6 +101,12 @@ public final class RealisticFire {
         }
     }
 
+    private static void onLevelLoad(LevelEvent.Load event) {
+        if (event.getLevel() instanceof ServerLevel level) {
+            FireSimulationManager.markPurgeOnLoad(level);
+        }
+    }
+
     private static void onLevelUnload(LevelEvent.Unload event) {
         if (event.getLevel() instanceof ServerLevel level) {
             FireSimulationManager.unload(level);
@@ -110,6 +128,18 @@ public final class RealisticFire {
     private static void onFluidPlaceBlock(BlockEvent.FluidPlaceBlockEvent event) {
         if (event.getLevel() instanceof ServerLevel level) {
             FireSimulationManager.forLevel(level).markDirty(event.getPos());
+        }
+    }
+
+    private static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            FireSimulationManager.forLevel(player.serverLevel()).syncVisualsToPlayer(player);
+        }
+    }
+
+    private static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            FireSimulationManager.forLevel(player.serverLevel()).syncVisualsToPlayer(player);
         }
     }
 }

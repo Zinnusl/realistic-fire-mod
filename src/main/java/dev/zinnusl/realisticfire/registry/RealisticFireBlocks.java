@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -30,6 +31,19 @@ public final class RealisticFireBlocks {
                     .mapColor(MapColor.COLOR_BLACK)
                     .strength(0.6f)
                     .sound(SoundType.GRASS)));
+
+    public static final DeferredBlock<FireLightBlock> FIRE_LIGHT = BLOCKS.register(
+            "fire_light",
+            () -> new FireLightBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.NONE)
+                    .replaceable()
+                    .noCollission()
+                    .noOcclusion()
+                    .strength(0.0f)
+                    .lightLevel(state -> 15)
+                    .pushReaction(PushReaction.DESTROY)
+                    .noLootTable()
+                    .randomTicks()));
 
     public static final DeferredBlock<Block> ASH = BLOCKS.register(
             "ash",

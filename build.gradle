@@ -106,6 +106,17 @@ def currentNativeSolverSource = {
     return file("${rustSolverDir}/target/release/librealisticfire_solver.so")
 }
 
+def nativeSolverArtifacts = [
+        [file("${rustSolverDir}/target/x86_64-unknown-linux-gnu/release/librealisticfire_solver.so"), 'realisticfire_solver_x86_64_linux.so'],
+        [file("${rustSolverDir}/target/aarch64-unknown-linux-gnu/release/librealisticfire_solver.so"), 'realisticfire_solver_aarch64_linux.so'],
+        [file("${rustSolverDir}/target/x86_64-pc-windows-msvc/release/realisticfire_solver.dll"), 'realisticfire_solver_x86_64_windows.dll'],
+        [file("${rustSolverDir}/target/x86_64-pc-windows-gnu/release/realisticfire_solver.dll"), 'realisticfire_solver_x86_64_windows.dll'],
+        [file("${rustSolverDir}/target/aarch64-pc-windows-msvc/release/realisticfire_solver.dll"), 'realisticfire_solver_aarch64_windows.dll'],
+        [file("${rustSolverDir}/target/aarch64-pc-windows-gnu/release/realisticfire_solver.dll"), 'realisticfire_solver_aarch64_windows.dll'],
+        [file("${rustSolverDir}/target/x86_64-apple-darwin/release/librealisticfire_solver.dylib"), 'realisticfire_solver_x86_64_macos.dylib'],
+        [file("${rustSolverDir}/target/aarch64-apple-darwin/release/librealisticfire_solver.dylib"), 'realisticfire_solver_aarch64_macos.dylib'],
+]
+
 tasks.register('buildRustSolverDev', Exec) {
     group = 'rust'
     description = 'Builds the Realistic Fire native solver for the current development platform.'
@@ -115,12 +126,23 @@ tasks.register('buildRustSolverDev', Exec) {
 
 tasks.register('copyRustSolverDev', Copy) {
     group = 'rust'
-    description = 'Copies the current-platform native solver into resources for local testing.'
+    description = 'Copies available native solver artifacts into resources for local testing.'
     dependsOn 'buildRustSolverDev'
+    def copiedNames = [] as LinkedHashSet
+    copiedNames.add(currentNativeSolverName())
+    into rustSolverNativesDir
     from(currentNativeSolverSource()) {
         rename { currentNativeSolverName() }
     }
-    into rustSolverNativesDir
+    nativeSolverArtifacts.each { spec ->
+        if (spec[0].exists()) {
+            if (copiedNames.add(spec[1])) {
+                from(spec[0]) {
+                    rename { spec[1] }
+                }
+            }
+        }
+    }
 }
 
 tasks.register('checkRustSolver', Exec) {

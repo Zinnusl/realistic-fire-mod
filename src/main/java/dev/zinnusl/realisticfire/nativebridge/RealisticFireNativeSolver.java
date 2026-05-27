@@ -11,7 +11,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 
 public final class RealisticFireNativeSolver {
-    public static final int ABI_VERSION = 4;
+    public static final int ABI_VERSION = 6;
     public static final int MUTATION_RECORD_INTS = 6;
     public static final int VISUAL_RECORD_FLOATS = 8;
     public static final int ACTION_SET_CHAR = 1;
@@ -40,6 +40,21 @@ public final class RealisticFireNativeSolver {
         } catch (LinkageError | RuntimeException exception) {
             disable("createWorld", exception);
             return 0L;
+        }
+    }
+
+    /**
+     * Set the horizontal sub-block resolution (cells per block per axis). Must be called right after
+     * {@link #createWorld} and before any tile upload — it resizes the cell grid and drops tiles.
+     */
+    public static void setSubBlockResolution(long worldHandle, int cellsPerAxis) {
+        if (!available || worldHandle == 0L) {
+            return;
+        }
+        try {
+            setSubBlockResolutionNative(worldHandle, cellsPerAxis);
+        } catch (LinkageError | RuntimeException exception) {
+            disable("setSubBlockResolution", exception);
         }
     }
 
@@ -164,6 +179,46 @@ public final class RealisticFireNativeSolver {
         }
     }
 
+    public static float querySmoke(long worldHandle, int x, int y, int z) {
+        if (!available || worldHandle == 0L) {
+            return 0.0f;
+        }
+        try {
+            return querySmokeNative(worldHandle, x, y, z);
+        } catch (LinkageError | RuntimeException exception) {
+            disable("querySmoke", exception);
+            return 0.0f;
+        }
+    }
+
+    /** Flat int array [x0,y0,z0, x1,y1,z1, ...] of the tile keys currently held by the solver. */
+    public static int[] loadedTileKeys(long worldHandle) {
+        if (!available || worldHandle == 0L) {
+            return new int[0];
+        }
+        try {
+            int[] keys = loadedTileKeysNative(worldHandle);
+            return keys != null ? keys : new int[0];
+        } catch (LinkageError | RuntimeException exception) {
+            disable("loadedTileKeys", exception);
+            return new int[0];
+        }
+    }
+
+    /** Flat int array [x0,y0,z0, ...] of the tile keys that currently have fire/heat. */
+    public static int[] activeTileKeys(long worldHandle) {
+        if (!available || worldHandle == 0L) {
+            return new int[0];
+        }
+        try {
+            int[] keys = activeTileKeysNative(worldHandle);
+            return keys != null ? keys : new int[0];
+        } catch (LinkageError | RuntimeException exception) {
+            disable("activeTileKeys", exception);
+            return new int[0];
+        }
+    }
+
     public static byte[] save(long worldHandle) {
         if (!available || worldHandle == 0L) {
             return new byte[0];
@@ -241,6 +296,8 @@ public final class RealisticFireNativeSolver {
 
     private static native long createWorldNative(int dimensionId, int minBuildHeight, int maxBuildHeight, int seed);
 
+    private static native void setSubBlockResolutionNative(long worldHandle, int cellsPerAxis);
+
     private static native void destroyWorldNative(long worldHandle);
 
     private static native void setTileNative(long worldHandle, int sectionX, int sectionY, int sectionZ, int[] materialIds, float[] initialState);
@@ -261,7 +318,13 @@ public final class RealisticFireNativeSolver {
 
     private static native float queryTemperatureNative(long worldHandle, int x, int y, int z);
 
+    private static native float querySmokeNative(long worldHandle, int x, int y, int z);
+
     private static native byte[] saveNative(long worldHandle);
+
+    private static native int[] loadedTileKeysNative(long worldHandle);
+
+    private static native int[] activeTileKeysNative(long worldHandle);
 
     private static native boolean loadNative(long worldHandle, byte[] snapshot);
 }

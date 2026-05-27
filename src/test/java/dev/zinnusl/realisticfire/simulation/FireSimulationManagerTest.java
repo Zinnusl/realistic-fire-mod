@@ -27,4 +27,16 @@ final class FireSimulationManagerTest {
         assertTrue(manager.contains("seedSyntheticFuelCell(pos, replacedState, temperatureK)"));
         assertTrue(manager.contains("return replacedState;"));
     }
+
+    @Test
+    void destructiveMutationsForceVisualEvidenceAndSmokeExposure() throws IOException {
+        String manager = Files.readString(Path.of("src/main/java/dev/zinnusl/realisticfire/simulation/FireSimulationManager.java"));
+        String bridge = Files.readString(Path.of("src/main/java/dev/zinnusl/realisticfire/nativebridge/RealisticFireNativeSolver.java"));
+
+        assertTrue(manager.contains("appendMutationVisual"), "terrain burn mutations should emit mandatory visual evidence");
+        assertTrue(manager.contains("sendVisuals(result, mutationVisuals)"), "mandatory mutation visuals should share the normal visual packet path");
+        assertTrue(manager.contains("applySmokeExposure"), "server tick should apply smoke exposure independently of client particles");
+        assertTrue(manager.contains("MobEffects.MOVEMENT_SLOWDOWN"), "smoke exposure should visibly choke entities before damage");
+        assertTrue(bridge.contains("querySmoke"), "smoke exposure should query authoritative native smoke state");
+    }
 }

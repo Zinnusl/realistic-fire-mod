@@ -8,5 +8,7 @@ publish = false
 name = "realisticfire_solver"
 crate-type = ["rlib", "cdylib"]
 
-[dependencies]
+# The JNI bridge is only built for the native shared library that the mod loads.
+# The WebAssembly build (parameter editor) compiles the same simulation core without it.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 jni = "0.21"

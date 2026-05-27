@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Realistic Fire — parameter editor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="stage">
+      <h1>Realistic Fire <small>parameter editor</small></h1>
+      <p class="sub">Top-down view of one ground layer. Same Rust solver the mod runs, compiled to
+        WebAssembly — dialed-in values transfer straight back.</p>
+
+      <div id="canvas-wrap">
+        <canvas id="view" width="640" height="640"></canvas>
+        <div id="legend">
+          <span><i class="sw fuel"></i> fuel</span>
+          <span><i class="sw ash"></i> burnt</span>
+          <span><i class="sw ember"></i> ember</span>
+          <span><i class="sw flame"></i> flame</span>
+          <span><i class="sw water"></i> water</span>
+        </div>
+      </div>
+
+      <div id="playback">
+        <button id="play">⏸ Pause</button>
+        <button id="reset">↻ Reset &amp; ignite</button>
+        <label class="inline"><input type="checkbox" id="autoloop" checked /> auto-loop</label>
+        <label class="inline">speed
+          <input type="range" id="speed" min="1" max="8" step="1" value="2" />
+          <span id="speed-val">2</span>×</label>
+      </div>
+
+      <div id="stats"></div>
+    </section>
+
+    <section id="panel">
+      <div class="panel-head">
+        <h2>Parameters</h2>
+        <button id="reset-defaults" title="Restore all sliders to the mod's shipped values">defaults</button>
+      </div>
+
+      <div class="group" id="scenario-group">
+        <h3>Scenario</h3>
+        <div class="rows" id="scenario-rows"></div>
+      </div>
+
+      <div class="group" id="solver-group">
+        <h3>Solver config <small>→ <code>SolverConfig</code></small></h3>
+        <div class="rows" id="solver-rows"></div>
+      </div>
+
+      <div class="group" id="material-group">
+        <h3>Material <small>→ material JSON</small></h3>
+        <div class="rows" id="material-rows"></div>
+      </div>
+
+      <div class="group">
+        <h3>Export</h3>
+        <div class="export-actions">
+          <button id="export">Generate config JSON</button>
+          <button id="copy">Copy</button>
+          <button id="download">Download</button>
+          <button id="apply-instance">Apply to instance</button>
+        </div>
+        <div id="apply-status"></div>
+        <textarea id="export-out" spellcheck="false" readonly placeholder="Generated config appears here…"></textarea>
+      </div>
+    </section>
+  </div>
+
+  <script src="editor.js"></script>
+</body>
+</html>
