@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "targets": [
+    { "tag": "minecraft:leaves" },
+    { "tag": "minecraft:wool" }
+  ],
+  "fuel": 0.55,
+  "ignition_temperature_k": 500.0,
+  "burn_rate": 0.08,
+  "heat_release": 1300.0,
+  "smoke_yield": 0.45,
+  "moisture": 0.08,
+  "insulation": 0.12,
+  "char_block": "realisticfire:charred_block",
+  "ash_block": "realisticfire:ash"
+}

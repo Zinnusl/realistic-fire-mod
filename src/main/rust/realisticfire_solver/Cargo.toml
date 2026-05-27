@@ -1,0 +1,12 @@
+[package]
+name = "realisticfire-solver"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+name = "realisticfire_solver"
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+jni = "0.21"

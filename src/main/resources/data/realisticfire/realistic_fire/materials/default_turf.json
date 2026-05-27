@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "targets": [
+    { "block": "minecraft:grass_block" },
+    { "block": "minecraft:podzol" },
+    { "block": "minecraft:mycelium" },
+    { "block": "minecraft:moss_block" }
+  ],
+  "fuel": 0.28,
+  "ignition_temperature_k": 470.0,
+  "burn_rate": 0.055,
+  "heat_release": 650.0,
+  "smoke_yield": 1.0,
+  "moisture": 0.12,
+  "insulation": 0.25,
+  "char_block": "realisticfire:charred_turf",
+  "ash_block": "minecraft:dirt"
+}

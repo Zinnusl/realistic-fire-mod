@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "targets": [
+    { "block": "realisticfire:charred_turf" }
+  ],
+  "fuel": 0.18,
+  "ignition_temperature_k": 500.0,
+  "burn_rate": 0.04,
+  "heat_release": 450.0,
+  "smoke_yield": 0.65,
+  "moisture": 0.0,
+  "insulation": 0.25,
+  "ash_block": "minecraft:dirt"
+}

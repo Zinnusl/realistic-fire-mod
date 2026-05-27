@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "targets": [
+    { "block": "realisticfire:charred_block" }
+  ],
+  "fuel": 0.32,
+  "ignition_temperature_k": 520.0,
+  "burn_rate": 0.045,
+  "heat_release": 700.0,
+  "smoke_yield": 0.55,
+  "moisture": 0.0,
+  "insulation": 0.35,
+  "ash_block": "realisticfire:ash"
+}

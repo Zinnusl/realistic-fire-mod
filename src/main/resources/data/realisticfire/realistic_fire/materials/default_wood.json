@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "targets": [
+    { "tag": "minecraft:logs" },
+    { "tag": "minecraft:planks" }
+  ],
+  "fuel": 1.0,
+  "ignition_temperature_k": 573.0,
+  "burn_rate": 0.035,
+  "heat_release": 1800.0,
+  "smoke_yield": 0.38,
+  "moisture": 0.05,
+  "insulation": 0.35,
+  "char_block": "realisticfire:charred_block",
+  "ash_block": "realisticfire:ash"
+}

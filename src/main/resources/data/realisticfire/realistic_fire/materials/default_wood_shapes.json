@@ -1,0 +1,29 @@
+{
+  "replace": false,
+  "targets": [
+    { "tag": "minecraft:wooden_slabs" },
+    { "tag": "minecraft:wooden_stairs" },
+    { "tag": "minecraft:wooden_fences" },
+    { "tag": "minecraft:wooden_doors" },
+    { "block": "minecraft:oak_stairs" },
+    { "block": "minecraft:spruce_stairs" },
+    { "block": "minecraft:birch_stairs" },
+    { "block": "minecraft:jungle_stairs" },
+    { "block": "minecraft:acacia_stairs" },
+    { "block": "minecraft:dark_oak_stairs" },
+    { "block": "minecraft:pale_oak_stairs" },
+    { "block": "minecraft:mangrove_stairs" },
+    { "block": "minecraft:bamboo_stairs" },
+    { "block": "minecraft:cherry_stairs" },
+    { "block": "minecraft:crimson_stairs" },
+    { "block": "minecraft:warped_stairs" }
+  ],
+  "fuel": 0.55,
+  "ignition_temperature_k": 573.0,
+  "burn_rate": 0.09,
+  "heat_release": 1200.0,
+  "smoke_yield": 0.38,
+  "moisture": 0.05,
+  "insulation": 0.35,
+  "ash_block": "minecraft:air"
+}

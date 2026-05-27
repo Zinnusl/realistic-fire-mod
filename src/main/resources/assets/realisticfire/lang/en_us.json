@@ -1,0 +1,8 @@
+{
+  "block.realisticfire.charred_block": "Charred Block",
+  "block.realisticfire.charred_turf": "Charred Turf",
+  "block.realisticfire.ash": "Ash",
+  "commands.realisticfire.ignite": "Ignited realistic fire at %s",
+  "commands.realisticfire.extinguish": "Extinguished realistic fire in %s blocks",
+  "commands.realisticfire.debug": "Realistic Fire debug mode: %s"
+}

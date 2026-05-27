@@ -1,0 +1,148 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'eclipse'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+version = mod_version
+group = mod_group_id
+base { archivesName = mod_id }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+neoForge {
+    version = neo_version
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = 'https://maven.neoforged.net/releases' }
+}
+
+dependencies {
+    compileOnly "org.spongepowered:mixin:0.8.7"
+    annotationProcessor "org.spongepowered:mixin:0.8.7:processor"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.3"
+    testImplementation "com.google.code.gson:gson:2.10.1"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replaceProperties
+    }
+    dependsOn 'copyRustSolverDev'
+}
+
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+    classpath += sourceSets.main.compileClasspath
+}
+
+tasks.named('compileTestJava', JavaCompile).configure {
+    classpath += sourceSets.main.compileClasspath
+}
+
+def rustSolverDir = file('src/main/rust/realisticfire_solver')
+def rustSolverNativesDir = file('src/main/resources/natives/realisticfire_solver')
+
+def currentNativeSolverName = {
+    def archProperty = System.getProperty('os.arch', '').toLowerCase(java.util.Locale.ROOT)
+    def arch = archProperty == 'arm' || archProperty.startsWith('aarch64') ? 'aarch64' : 'x86_64'
+    def osName = System.getProperty('os.name', '').toLowerCase(java.util.Locale.ROOT)
+    if (osName.contains('win')) return "realisticfire_solver_${arch}_windows.dll"
+    if (osName.contains('mac') || osName.contains('darwin')) return "realisticfire_solver_${arch}_macos.dylib"
+    return "realisticfire_solver_${arch}_linux.so"
+}
+
+def currentNativeSolverSource = {
+    def osName = System.getProperty('os.name', '').toLowerCase(java.util.Locale.ROOT)
+    if (osName.contains('win')) return file("${rustSolverDir}/target/release/realisticfire_solver.dll")
+    if (osName.contains('mac') || osName.contains('darwin')) return file("${rustSolverDir}/target/release/librealisticfire_solver.dylib")
+    return file("${rustSolverDir}/target/release/librealisticfire_solver.so")
+}
+
+tasks.register('buildRustSolverDev', Exec) {
+    group = 'rust'
+    description = 'Builds the Realistic Fire native solver for the current development platform.'
+    workingDir rustSolverDir
+    commandLine 'cargo', 'build', '--release'
+}
+
+tasks.register('copyRustSolverDev', Copy) {
+    group = 'rust'
+    description = 'Copies the current-platform native solver into resources for local testing.'
+    dependsOn 'buildRustSolverDev'
+    from(currentNativeSolverSource()) {
+        rename { currentNativeSolverName() }
+    }
+    into rustSolverNativesDir
+}
+
+tasks.register('checkRustSolver', Exec) {
+    group = 'verification'
+    description = 'Runs Rust unit tests for the native solver.'
+    workingDir rustSolverDir
+    commandLine 'cargo', 'test'
+}
+
+tasks.named('check') {
+    dependsOn 'checkRustSolver'
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors
+        ])
+    }
+}

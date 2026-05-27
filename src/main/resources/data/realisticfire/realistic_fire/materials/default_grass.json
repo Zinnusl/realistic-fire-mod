@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "targets": [
+    { "block": "minecraft:short_grass" },
+    { "block": "minecraft:tall_grass" },
+    { "block": "minecraft:fern" },
+    { "block": "minecraft:large_fern" },
+    { "block": "minecraft:dead_bush" },
+    { "tag": "minecraft:flowers" },
+    { "tag": "minecraft:saplings" }
+  ],
+  "fuel": 0.35,
+  "ignition_temperature_k": 430.0,
+  "burn_rate": 0.18,
+  "heat_release": 900.0,
+  "smoke_yield": 0.12,
+  "moisture": 0.04,
+  "insulation": 0.05,
+  "ash_block": "minecraft:air"
+}
